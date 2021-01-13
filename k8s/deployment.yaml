@@ -1,0 +1,103 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: my-service
+  namespace: my-services
+  labels:
+    app: my-service
+spec:
+  selector:
+    matchLabels:
+      app: my-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-service
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: my-service-secret
+                  key: postgres_host
+            - name: POSTGRES_PORT
+              value: "5432"
+          command:
+          - /bin/sh
+          - -c
+          - until nc -zv $POSTGRES_HOST $POSTGRES_PORT -w1; do echo 'waiting for postgres';
+            sleep 1; done
+        - name: migration
+          image: devil1211/my-service:{{COMMIT_ID}}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres_password
+            - name: POSTGRES_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-service-secret
+                  key: postgres_db_name
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: my-service-secret
+                  key: postgres_host
+          command:
+          - /bin/bash
+          - -c
+          - while true; do sequelize db:migrate; if [[ 0 -eq $? ]]; then exit 0; fi;
+            sleep 2;  done;
+      containers:
+        - name: user-service
+          image: devil1211/my-service:{{COMMIT_ID}}
+          env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: postgres_user  
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: postgres_password
+          - name: POSTGRES_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: my-service-secret
+                key: postgres_db_name
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: my-service-secret
+                key: postgres_host      
+          ports:
+          - containerPort: 8085
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8085
+            failureThreshold: 2
+            periodSeconds: 20
+            initialDelaySeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8085
+            failureThreshold: 5
+            periodSeconds: 10
+            initialDelaySeconds: 30

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  namespace: my-service
+spec:
+  ports:
+  - name: connect
+    port: 8085
+    protocol: TCP 
+    targetPort: 8085
+  selector:
+    app: my-service
