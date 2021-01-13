@@ -12,9 +12,10 @@ This will give you a basic idea about a nodejs ci/cd Pipeline.
 [https://github.com/devkishanJoshi/DevOps/tree/master/Jenkins-Sonarqube](Use the following to setup if not)
 * Provision a Postgres DB: Must be reachable from your cluster and Sonarqube instance
 
-### Installing
+### Install
 
-1. Download the require plugins in Jenkins:
+#### 1. Download the require plugins in Jenkins:
+
 * SonarQube Scanner
 * Kubernetes CLI
 * Gitlab Hook Plugin
@@ -24,7 +25,7 @@ This will give you a basic idea about a nodejs ci/cd Pipeline.
 * Email Extension
 
 
-2. Store the required credentials in jenkins *Manage Credentials*: 
+#### 2. Store the required credentials in jenkins *Manage Credentials*: 
 
 * Github (Username with password)
 * Sonarqube  (Secret text): Login token generate on sonarqube 
@@ -33,19 +34,19 @@ This will give you a basic idea about a nodejs ci/cd Pipeline.
 
 
 
-3. Create webhook in your Git repository hosting service:
+#### 3. Create webhook in your Git repository hosting service:
 
 Create a webhook so that when you push code to the respective branch (Master) in our case your code will be deployed to the cluster
 
 
-4. Create a job in jenkins:
+#### 4. Create a job in jenkins:
 
 * Pipeline File: ./Jenkinsfile
 * Dockerfile for NodeJS app: ./Dockerfile
 * Files related to  NodeJS app: ./package.json, ./server.js, and ./test/*
 
 
-Technology Stack used: 
+#### Technology Stack used: 
 
 * Git/GitHub  (Developer push code to gitHub -> Triggers the Job in Jenkins)
 * Jenkins (The Job use the Jenkinsfile present)
