@@ -3,16 +3,15 @@
 CI/CD pipeline for a NodeJS app.
 
 ## Getting Started
-```
+
 This will give you a basic idea about a nodejs ci/cd Pipeline.
-```
+
 ### Prerequisites
-```
 
 * The Jenkins, Sonarqube and k8s cluster needs to be up 
 [https://github.com/devkishanJoshi/DevOps/tree/master/Jenkins-Sonarqube](Use the following to setup if not)
 * Provision a Postgres DB: Must be reachable from your cluster and Sonarqube instance
-```
+
 ### Installing
 
 1. Download the require plugins in Jenkins:
